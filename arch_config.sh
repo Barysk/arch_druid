@@ -1,13 +1,17 @@
 # Script that auto configures and installs all software I use on my arch ;)
-# shebang!
+	# shebang!
 
 #! /bin/sh
 
 
 TMP_FOLDER="arch_config"
 RST_PATH="$HOME/$TMP_FOLDER"
-
 GPU_VENDOR=""
+
+STEAM="0"
+MINECRAFT="0"
+LATEX="0"
+EMULATORS="0"
 
 INTEL_PACKAGES=(
 	vulkan-intel
@@ -36,13 +40,13 @@ BASE_PACKAGES=(
 	linux-zen-headers
 )
 
-# TODO: separate for readability
 PACMAN_PACKAGES=(
 	neovim
 	xorg
 	wayland
 	uwsm
 	hyprland
+	waybar
 	man-db
 	xdg-desktop-portal-gtk
 	xdg-desktop-portal-hyprland
@@ -56,10 +60,8 @@ PACMAN_PACKAGES=(
 	gtk3
 	gtk4
 	thermald
-	texlive
 	tailscale
 	swww
-	steam
 	shotcut
 	ripgrep
 	redshift
@@ -81,7 +83,6 @@ PACMAN_PACKAGES=(
 	lib32-pipewire-jack
 	pipewire-pulse
 	playerctl
-	prismlauncher
 	sof-firmware
 	wireplumber
 	lib32-mesa
@@ -125,9 +126,10 @@ PACMAN_PACKAGES=(
 	brightnessctl
 	bluez
 	bluez-utils
-	biber
 	bat
 	audacity
+	zathura
+	zathura-pdf-mupdf
 )
 
 PARU_PACKAGES=(
@@ -141,8 +143,6 @@ PARU_PACKAGES=(
 	tofi
 	vesktop-bin
 	xpadneo-dkms
-	pcsx2-latest-bin
-	rpcs3-bin
 )
 
 # Probably unneded paru packages
@@ -158,7 +158,6 @@ PARU_PACKAGES=(
 # ttf-mplus-git
 # ucl
 # vscodium-bin
-# xnp2
 
 
 echo "GPU?"
@@ -189,6 +188,33 @@ echo ""
 echo "$GPU_VENDOR chosen"
 echo "needed drivers will be installed"
 
+
+echo "Install steam?"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	STEAM="1"
+fi
+
+
+echo "Install LaTeX? (texlive, biber)"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	LATEX="1"
+fi
+
+echo "Install minecraft launcher? (prismlauncher)"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	MINECRAFT="1"
+fi
+
+echo "Install emulators? (pcsx2, rpcs3, xnp2)"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	EMULATORS="1"
+fi
+
+echo "Configuration started!"
 
 cd $HOME
 echo "creating temporary $TMP_FOLDER at $HOME"
@@ -256,6 +282,22 @@ esac
 echo "downloading packages using pacman"
 sudo pacman -S --needed "${PACMAN_PACKAGES[@]}"
 
+if [[ "$STEAM" == "1" ]]; then
+	sudo pacman -S --needed steam
+fi
+
+if [[ "$LATEX" == "1" ]]; then
+	sudo pacman -S --needed texlive-most biber
+fi
+
+if [[ "$MINECRAFT" == "1" ]]; then
+	sudo pacman -S --needed prismlauncher
+fi
+
+if [[ "$EMULATORS" == "1" ]]; then
+	paru -S --needed pcsx2-latest-bin rpcs3-bin xnp2
+fi
+
 
 echo "downloading packages using paru"
 paru -S --needed "${PARU_PACKAGES[@]}"
@@ -273,3 +315,8 @@ sudo auto-cpufreq --install
 
 echo "All done!"
 
+echo "Reboot?"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	reboot
+fi
