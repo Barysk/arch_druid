@@ -30,10 +30,14 @@ NVIDIA_PACKAGES=(
 	lib32-nvidia-utils
 )
 
-# TODO: separate for readability
-PACMAN_PACKAGES=(
+BASE_PACKAGES=(
 	base
 	base-devel
+	linux-zen-headers
+)
+
+# TODO: separate for readability
+PACMAN_PACKAGES=(
 	neovim
 	xorg
 	wayland
@@ -97,7 +101,6 @@ PACMAN_PACKAGES=(
 	materia-gtk-theme
 	mako
 	lutris
-	linux-zen-headers
 	kvantum
 	krita
 	kitty
@@ -197,9 +200,12 @@ cd $RST_PATH
 # echo "updating system"
 # sudo pacman -Syu
 
+echo "ensuring base are installed"
+sudo pacman -S $BASE_PACKAGES
 
-# echo "installing git"
-# sudo pacman -S git
+
+echo "installing git"
+sudo pacman -S git
 
 
 echo "downloading paru-bin"
