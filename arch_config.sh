@@ -69,7 +69,7 @@ PACMAN_PACKAGES=(
 	qutebrowser
 	qt6ct
 	qt5ct
-	qt5ct-wayland
+	qt5-wayland
 	qjackctl
 	qbittorrent
 	pipewire
@@ -201,11 +201,11 @@ echo "updating system"
 sudo pacman -Syu
 
 echo "ensuring base are installed"
-sudo pacman -S $BASE_PACKAGES
+sudo pacman -S --needed $BASE_PACKAGES
 
 
 echo "installing git"
-sudo pacman -S git
+sudo pacman -S --needed git
 
 
 echo "downloading paru-bin"
@@ -242,23 +242,23 @@ mv dot_hyprland/dot_bashrc $HOME/.bashrc
 
 case "$GPU_VENDOR" in
 	intel)
-		sudo pacman -S "${INTEL_PACKAGES[@]}"
+		sudo pacman -S --needed "${INTEL_PACKAGES[@]}"
 		;;
 	amd)
-		sudo pacman -S "${AMD_PACKAGES[@]}"
+		sudo pacman -S --needed "${AMD_PACKAGES[@]}"
 		;;
 	nvidia)
-		sudo pacman -S "${NVIDIA_PACKAGES[@]}"
+		sudo pacman -S --needed "${NVIDIA_PACKAGES[@]}"
 		;;
 esac
 
 
 echo "downloading packages using pacman"
-sudo pacman -S "${PACMAN_PACKAGES[@]}"
+sudo pacman -S --needed "${PACMAN_PACKAGES[@]}"
 
 
 echo "downloading packages using paru"
-sudo paru -S "${PARU_PACKAGES[@]}"
+paru -S --needed "${PARU_PACKAGES[@]}"
 
 
 echo "removing $TMP_FOLDER at $HOME"
@@ -269,7 +269,7 @@ echo "updating tldr"
 tldr --update
 
 echo "setting up auto-cpufreq"
-sudo auto-cpufreq install
+sudo auto-cpufreq --install
 
 echo "All done!"
 
