@@ -132,9 +132,7 @@ PACMAN_PACKAGES=(
 
 PARU_PACKAGES=(
 	anki-bin
-	aseprite
 	auto-cpufreq
-	postbird-bin
 	blockbench-bin
 	bluetuith-bin
 	brave-bin
@@ -148,6 +146,8 @@ PARU_PACKAGES=(
 )
 
 # Probably unneded paru packages
+# aseprite
+# postbird-bin
 # betterbird-bin
 # electron6-bin
 # giblib
@@ -242,23 +242,23 @@ mv dot_hyprland/dot_bashrc $HOME/.bashrc
 
 case "$GPU_VENDOR" in
 	intel)
-		pacman -S "${INTEL_PACKAGES[@]}"
+		sudo pacman -S "${INTEL_PACKAGES[@]}"
 		;;
 	amd)
-		pacman -S "${AMD_PACKAGES[@]}"
+		sudo pacman -S "${AMD_PACKAGES[@]}"
 		;;
 	nvidia)
-		pacman -S "${NVIDIA_PACKAGES[@]}"
+		sudo pacman -S "${NVIDIA_PACKAGES[@]}"
 		;;
 esac
 
 
 echo "downloading packages using pacman"
-pacman -S "${PACMAN_PACKAGES[@]}"
+sudo pacman -S "${PACMAN_PACKAGES[@]}"
 
 
 echo "downloading packages using paru"
-paru -S "${PARU_PACKAGES[@]}"
+sudo paru -S "${PARU_PACKAGES[@]}"
 
 
 echo "removing $TMP_FOLDER at $HOME"
