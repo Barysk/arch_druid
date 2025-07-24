@@ -1,5 +1,5 @@
 # Script that auto configures and installs all software I use on my arch ;)
-	# shebang!
+# shebang!
 
 #! /bin/sh
 
@@ -197,8 +197,8 @@ mkdir $TMP_FOLDER
 cd $RST_PATH
 
 
-# echo "updating system"
-# sudo pacman -Syu
+echo "updating system"
+sudo pacman -Syu
 
 echo "ensuring base are installed"
 sudo pacman -S $BASE_PACKAGES
