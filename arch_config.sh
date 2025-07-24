@@ -5,6 +5,7 @@
 
 TMP_FOLDER="arch_config"
 RST_PATH="$HOME/$TMP_FOLDER"
+AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
 GPU_VENDOR=""
 
 
@@ -154,11 +155,14 @@ echo "ver2025.07.25"
 echo "bk"
 echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
 echo ""
+echo "Prerequisites: You have a minimal Arch Linux install with the linux-zen kernel"
+echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
+echo ""
 
 echo "GPU?"
 echo "1) INTEL [thinkpad x220]"
 echo "2) AMD [thinkpad t14]"
-echo "3) NVIDIA RTX 30+ [acer NITRO RTX 3060]"
+echo "3) NVIDIA TURING+ [acer NITRO RTX 3060]"
 read -rp "Choice (1-3): " choice
 
 
@@ -421,6 +425,31 @@ echo ""
 
 
 echo "All done!"
+echo ""
+WHAT_NOW='
+What now?
+1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to $HOME/.config/hypr/hyprvars.conf in the default_monitor
+2. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is turned off by default
+3. Eduroam? Yeah, you need to enable legacy support
+Check connection details first with your institution before applying any profiles listed in this section. Example profiles are not guaranteed to work or match any security requirements.
+When storing connection profiles unencrypted, it is recommended to restrict read access to the root account by specifying chmod 600 profile as root.
+If authentication keeps failing with NetworkManager, try setting phase1-auth-flags=32 for TLS 1.0 or phase1-auth-flags=64 for TLS 1.1, as described in [2] and NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL "unsupported protocol" error.
+
+Links:
+- Wiki
+https://wiki.archlinux.org/title/Network_configuration/Wireless
+- NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL "unsupported protocol" error
+https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+- Eduroam Configuration Assistant Tool
+https://cat.eduroam.org/
+'
+echo "$WHAT_NOW"
+
+echo "$WHAT_NOW" > "$AFTER_INSTALL_INSTRUCTIONS"
+
+echo "those instructions are saved to $AFTER_INSTALL_INSTRUCTIONS"
+echo ""
+echo "before you do this reboot is advised"
 echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
 echo ""
 
