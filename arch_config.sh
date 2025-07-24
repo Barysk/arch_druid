@@ -1,5 +1,5 @@
 # Script that auto configures and installs all software I use on my arch ;)
-# shebang!
+	# shebang!
 
 #! /bin/sh
 
@@ -9,24 +9,29 @@ RST_PATH="$HOME/$TMP_FOLDER"
 
 GPU_VENDOR=""
 
-INTEL_PACKAGES=""
+INTEL_PACKAGES=(
+	vulkan-intel
+	lib32-vulkan-intel
+	xf86-video-intel
+)
 
-AMD_PACKAGES="
+AMD_PACKAGES=(
 	vulkan-radeon
+	lib32-vulkan-radeon
 	xf86-video-amdgpu
-"
+)
 
 # you probably don't need it
 # amdvlk
 
-NVIDIA_PACKAGES="
+NVIDIA_PACKAGES=(
 	nvidia-open-dkms
 	nvidia-utils
 	lib32-nvidia-utils
-"
+)
 
-
-PACMAN_PACKAGES="
+# TODO: separate for readability
+PACMAN_PACKAGES=(
 	base
 	base-devel
 	neovim
@@ -120,9 +125,9 @@ PACMAN_PACKAGES="
 	biber
 	bat
 	audacity
-"
+)
 
-PARU_PACKAGES="
+PARU_PACKAGES=(
 	anki-bin
 	aseprite
 	auto-cpufreq
@@ -137,7 +142,7 @@ PARU_PACKAGES="
 	xpadneo-dkms
 	pcsx2-latest-bin
 	rpcs3-bin
-"
+)
 
 # Probably unneded paru packages
 # betterbird-bin
@@ -161,19 +166,19 @@ read -rp "Enter choice (1-3): " choice
 
 
 case "$choice" in
-    1)
-        GPU_VENDOR="intel"
-        ;;
-    2)
-        GPU_VENDOR="amd"
-        ;;
-    3)
-        GPU_VENDOR="nvidia"
-        ;;
-    *)
-        echo "Invalid choice. Exiting."
-        exit 1
-        ;;
+	1)
+		GPU_VENDOR="intel"
+		;;
+	2)
+		GPU_VENDOR="amd"
+		;;
+	3)
+		GPU_VENDOR="nvidia"
+		;;
+	*)
+		echo "Invalid choice. Exiting."
+		exit 1
+		;;
 esac
 
 
@@ -206,47 +211,59 @@ git clone https://github.com/barysk/dot_hyprland
 git clone https://github.com/barysk/nvim
 
 
-# echo "installing paru-bin"
-# cd paru-bin
-# makepkg -sri
-# cd $RST_PATH
-#
-#
-# echo "applying dotfiles"
-# # nvim
-# cd nvim
-# rm -rf .git
-# cd ..
-# mv nvim $HOME/.config/
-# # hypr # TODO compile modules
-# cd dot_hyprland
-# rm -rf .git
-# cd ..
-# mv dot_hyprland/dot_config/* $HOME/.config/
-# mv dot_hyprland/dot_fonts $HOME/.fonts
-# mv dot_hyprland/dot_bashrc $HOME/.bashrc
+echo "installing paru-bin"
+cd paru-bin
+makepkg -sri
+cd $RST_PATH
 
 
-# echo "downloading packages using pacman"
-#
+echo "applying dotfiles"
+
+# nvim
+cd nvim
+rm -rf .git
+cd ..
+mv nvim $HOME/.config/
+
+# hypr # TODO compile modules
+cd dot_hyprland
+rm -rf .git
+cd ..
+mv dot_hyprland/dot_config/* $HOME/.config/
+mv dot_hyprland/dot_fonts $HOME/.fonts
+mv dot_hyprland/dot_bashrc $HOME/.bashrc
 
 
-# echo "downloading packages using paru"
-# paru -S ${PARU_PACKAGES[@]}
+case "$GPU_VENDOR" in
+	intel)
+		pacman -S "${INTEL_PACKAGES[@]}"
+		;;
+	amd)
+		pacman -S "${AMD_PACKAGES[@]}"
+		;;
+	nvidia)
+		pacman -S "${NVIDIA_PACKAGES[@]}"
+		;;
+esac
 
-# echo "setting default uwsm"
-# uwsm blah
 
-# echo "removing $TMP_FOLDER at $HOME"
-# cd $HOME
-# rm -rf $TMP_FOLDER
+echo "downloading packages using pacman"
+pacman -S "${PACMAN_PACKAGES[@]}"
 
-# echo "updating tldr"
-# tldr --update
 
-# echo "setting up auto-cpufreq"
-# sudo auto-cpufreq install
+echo "downloading packages using paru"
+paru -S "${PARU_PACKAGES[@]}"
+
+
+echo "removing $TMP_FOLDER at $HOME"
+cd $HOME
+rm -rf $TMP_FOLDER
+
+echo "updating tldr"
+tldr --update
+
+echo "setting up auto-cpufreq"
+sudo auto-cpufreq install
 
 echo "All done!"
-echo "You can remove folder $TMP_FOLDER at $HOME"
 
