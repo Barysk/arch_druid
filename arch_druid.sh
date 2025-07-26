@@ -2,12 +2,43 @@
 # Script that auto configures and installs all software I use on my arch ;)
 # shebang!
 
+MSG_VELCOME="Druid velcomes you!
+He will install my dotfiles and the applications I use.
+You will be prompted with some queries thus Please don't leave until the Druid
+is done.
 
-TMP_FOLDER="arch_config"
+ver2025.07.26
+bk"
+
+MSG_BYE='What now?
+1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to
+$HOME/.config/hypr/hyprvars.conf in the default_monitor
+2. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is
+turned off by default
+3. Eduroam? Yeah, you need to enable legacy support
+Check connection details first with your institution before applying any
+profiles listed in this section. Example profiles are not guaranteed to work or
+match any security requirements.
+When storing connection profiles unencrypted, it is recommended to restrict
+read access to the root account by specifying chmod 600 profile as root.
+If authentication keeps failing with NetworkManager, try setting
+phase1-auth-flags=32 for TLS 1.0 or phase1-auth-flags=64 for TLS 1.1, as
+described in [2] and NetworkManager#WPA Enterprise connections fail to
+authenticate with OpenSSL "unsupported protocol" error.
+
+Links:
+> Wiki
+  https://wiki.archlinux.org/title/Network_configuration/Wireless
+> NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL
+"unsupported protocol" error
+  https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+> Eduroam Configuration Assistant Tool
+  https://cat.eduroam.org/'
+
+TMP_FOLDER="arch_druid"
 RST_PATH="$HOME/$TMP_FOLDER"
 AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
 GPU_VENDOR=""
-
 
 STEAM="0"
 MINECRAFT="0"
@@ -17,7 +48,6 @@ ASEPRITE="0"
 BETTERBIRD="0"
 NEOTHESIA="0"
 RUST="0"
-
 
 INTEL_PACKAGES=(
 	vulkan-intel
@@ -44,120 +74,140 @@ BASE_PACKAGES=(
 )
 
 PACMAN_PACKAGES=(
+	# Terminal
+	bat
+	btop
+	dust
+	fastfetch
+	fzf
+	github-cli
+	htop
+	imagemagick
+	jp2a
+	kitty
+	man-db
 	neovim
+	ripgrep
+	tldr
+	tmux
+	tree
+	tree-sitter-cli
+	udisks2
+
+	# Display 
 	xorg
 	wayland
 	uwsm
 	hyprland
-	waybar
-	man-db
 	xdg-desktop-portal-gtk
 	xdg-desktop-portal-hyprland
-	udisks2
-	tree-sitter-cli
-	tree
-	tmux
-	tldr
-	timidity++
-	freepats-general-midi
-	gtk3
-	gtk4
+
+	# Base
+	lib32-mesa
+	xf86-video-vesa
+	networkmanager
+	wl-clipboard
+	bluez
+	bluez-utils
 	thermald
-	tailscale
-	swww
-	shotcut
-	ripgrep
+
+	# Hyprland things
+	brightnessctl
+	hyprlock
+	hyprpolkitagent
+	hyprshot
+	hyprsunset
+	mako
+	network-manager-applet
+	playerctl
 	redshift
-	reaper
-	raylib
+	swww
+	waybar
+
+	# Development
+	clang
 	odin
-	qutebrowser
-	qt6ct
-	qt5ct
-	qt5-wayland
-	qjackctl
+	raylib
+	docker
+	electron
+
+	# Applications
+	audacity
+	carla
+	imv
+	krita
+	lutris
+	mpv
+	obs-studio
+	pavucontrol
+	pcmanfm-gtk3
 	qbittorrent
-	pipewire
+	qutebrowser
+	reaper
+	shotcut
+	tailscale
+	telegram-desktop
+	zathura
+	zathura-pdf-mupdf
+
+	# Sound
+	wireplumber
+	qjackctl
 	alsa-utils
+	pipewire
 	lib32-pipewire
 	pipewire-alsa
 	lib32-alsa-plugins
 	pipewire-jack
 	lib32-pipewire-jack
 	pipewire-pulse
-	playerctl
+	gst-plugin-pipewire
+	timidity++
+	freepats-general-midi
 	sof-firmware
-	wireplumber
-	lib32-mesa
-	wl-clipboard
+
+	# Wine
 	wine-staging
 	wine-mono
-	xf86-video-vesa
-	pcmanfm-gtk3
-	pavucontrol
+
+	# Theming
+	gtk3
+	gtk4
+	qt6ct
+	qt5ct
+	qt5-wayland
 	papirus-icon-theme
-	obs-studio
-	telegram-desktop
-	nwg-look
-	networkmanager
-	network-manager-applet
-	mpv
 	materia-gtk-theme
-	mako
-	lutris
+	nwg-look
 	kvantum
-	krita
-	kitty
-	jp2a
-	imv
-	imagemagick
-	hyprsunset
-	hyprshot
-	hyprpolkitagent
-	hyprlock
-	htop
-	btop
-	gst-plugin-pipewire
-	github-cli
-	fzf
-	fastfetch
-	electron
-	dust
-	clang
-	docker
-	carla
-	brightnessctl
-	bluez
-	bluez-utils
-	bat
-	audacity
-	zathura
-	zathura-pdf-mupdf
 )
 
 PARU_PACKAGES=(
-	anki-bin
+	tofi
 	auto-cpufreq
-	blockbench-bin
 	bluetuith-bin
 	brave-bin
 	librewolf-bin
 	proton-ge-custom-bin
-	tofi
+	anki-bin
+	blockbench-bin
 	vesktop-bin
 	xpadneo-dkms
 )
 
+SEPARATOR='
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+'
+
 clear
 
-echo "Welcome to auto_arch_conf"
-echo "ver2025.07.25"
-echo "bk"
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$MSG_VELCOME"
+echo "$SEPARATOR"
+
+
 echo "Prerequisites: You have a minimal Arch Linux install with the linux-zen kernel"
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
+
 
 echo "GPU?"
 echo "1) INTEL [thinkpad x220]"
@@ -181,14 +231,12 @@ case "$choice" in
 		exit 1
 		;;
 esac
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "$GPU_VENDOR chosen"
 echo "needed drivers will be installed"
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Install steam?"
@@ -196,8 +244,7 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	STEAM="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Install LaTeX? (texlive, biber)"
@@ -205,8 +252,7 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	LATEX="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Compile aseprite?"
@@ -214,8 +260,7 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	ASEPRITE="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Install minecraft launcher? (prismlauncher)"
@@ -223,8 +268,7 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	MINECRAFT="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Install emulators? (pcsx2, rpcs3, xnp2)"
@@ -232,8 +276,7 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	EMULATORS="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Install mail client? (betterbird-bin)"
@@ -241,8 +284,7 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	BETTERBIRD="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Compile neothesia?"
@@ -250,69 +292,59 @@ read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	NEOTHESIA="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
-echo "Install RUST Lang?"
+echo "Install RUST Lang? Using curl command provided on the rust webpage"
 read -rp "[ Y/n ]: " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
 	RUST="1"
 fi
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
-echo "Configuration started!"
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "Druid begun ritual!"
+echo "$SEPARATOR"
 
 
 cd $HOME
 echo "creating temporary $TMP_FOLDER at $HOME"
 mkdir $TMP_FOLDER
 cd $RST_PATH
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "updating system"
 sudo pacman -Syu
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "ensuring base are installed"
 sudo pacman -S --needed $BASE_PACKAGES
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "installing git"
 sudo pacman -S --needed git
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "downloading paru-bin"
 git clone https://aur.archlinux.org/paru-bin.git
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "downloading dotfiles"
 git clone https://github.com/barysk/dot_hyprland
 git clone https://github.com/barysk/nvim
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "installing paru-bin"
 cd paru-bin
 makepkg -sri
 cd $RST_PATH
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "applying dotfiles"
@@ -328,8 +360,7 @@ cd ..
 mv dot_hyprland/dot_config/* $HOME/.config/
 mv dot_hyprland/dot_fonts $HOME/.fonts
 mv dot_hyprland/dot_bashrc $HOME/.bashrc
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Installing GPU drivers"
@@ -344,8 +375,7 @@ case "$GPU_VENDOR" in
 		sudo pacman -S --needed "${NVIDIA_PACKAGES[@]}"
 		;;
 esac
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Installing packages using pacman"
@@ -374,8 +404,7 @@ if [[ "$RUST" == "1" ]]; then
 	fi
 fi
 
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "downloading packages using paru"
@@ -393,65 +422,42 @@ if [[ "$NEOTHESIA" == "1" ]]; then
 	paru -S --needed neothesia
 fi
 
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "removing $TMP_FOLDER at $HOME"
 cd $HOME
 rm -rf $TMP_FOLDER
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "building modules for waybar"
 cd $HOME/.config/waybar/src_modules/
 ./build_modules.sh
 cd $HOME
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "updating tldr"
 tldr --update
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "setting up auto-cpufreq"
 sudo auto-cpufreq --install
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "All done!"
 echo ""
-WHAT_NOW='
-What now?
-1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to $HOME/.config/hypr/hyprvars.conf in the default_monitor
-2. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is turned off by default
-3. Eduroam? Yeah, you need to enable legacy support
-Check connection details first with your institution before applying any profiles listed in this section. Example profiles are not guaranteed to work or match any security requirements.
-When storing connection profiles unencrypted, it is recommended to restrict read access to the root account by specifying chmod 600 profile as root.
-If authentication keeps failing with NetworkManager, try setting phase1-auth-flags=32 for TLS 1.0 or phase1-auth-flags=64 for TLS 1.1, as described in [2] and NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL "unsupported protocol" error.
+echo "$MSG_BYE"
 
-Links:
-- Wiki
-https://wiki.archlinux.org/title/Network_configuration/Wireless
-- NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL "unsupported protocol" error
-https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
-- Eduroam Configuration Assistant Tool
-https://cat.eduroam.org/
-'
-echo "$WHAT_NOW"
-
-echo "$WHAT_NOW" > "$AFTER_INSTALL_INSTRUCTIONS"
+echo "$MSG_BYE" > "$AFTER_INSTALL_INSTRUCTIONS"
 
 echo "those instructions are saved to $AFTER_INSTALL_INSTRUCTIONS"
 echo ""
 echo "before you do this reboot is advised"
-echo "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
-echo ""
+echo "$SEPARATOR"
 
 
 echo "Reboot?"
