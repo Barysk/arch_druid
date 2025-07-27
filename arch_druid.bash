@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 # Script that auto configures and installs all software I use on my arch ;)
 # shebang!
 
@@ -7,7 +7,7 @@ He will install my dotfiles and the applications I use.
 You will be prompted with some queries thus Please don't leave until the Druid
 is done.
 
-ver2025.07.26
+ver2025.07.27
 bk"
 
 MSG_BYE='What now?
@@ -40,14 +40,20 @@ RST_PATH="$HOME/$TMP_FOLDER"
 AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
 GPU_VENDOR=""
 
+# OPTIONAL
 STEAM="0"
 MINECRAFT="0"
-LATEX="0"
 EMULATORS="0"
+LATEX="0"
+
 ASEPRITE="0"
 BETTERBIRD="0"
 NEOTHESIA="0"
 RUST="0"
+
+REIHA="0"
+TESUTERU="0"
+TOOLS="0"
 
 INTEL_PACKAGES=(
 	vulkan-intel
@@ -303,6 +309,30 @@ fi
 echo "$SEPARATOR"
 
 
+echo "Install reiha? My minimalistic presentation tool"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	REIHA="1"
+fi
+echo "$SEPARATOR"
+
+
+echo "Install tesuteru? testownik-cli - my implementation of testownik"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	TESUTERU="1"
+fi
+echo "$SEPARATOR"
+
+
+echo "Install handy tools? My timer and stopwatch"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	TOOLS="1"
+fi
+echo "$SEPARATOR"
+
+
 echo "Druid begun ritual!"
 echo "$SEPARATOR"
 
@@ -351,12 +381,12 @@ echo "applying dotfiles"
 # nvim
 cd nvim
 rm -rf .git
-cd ..
+cd $RST_PATH
 mv nvim $HOME/.config/
 # hypr
 cd dot_hyprland
 rm -rf .git
-cd ..
+cd $RST_PATH
 mv dot_hyprland/dot_config/* $HOME/.config/
 mv dot_hyprland/dot_fonts $HOME/.fonts
 mv dot_hyprland/dot_bashrc $HOME/.bashrc
@@ -420,6 +450,26 @@ fi
 
 if [[ "$NEOTHESIA" == "1" ]]; then
 	paru -S --needed neothesia
+fi
+
+if [[ "$REIHA" == "1" ]]; then
+	curl -L -o reiha https://github.com/Barysk/reiha/releases/download/v1.2.0/reiha
+	chmod +x reiha
+	sudo mv reiha /usr/local/bin/
+fi
+
+if [[ "$TESUTERU" == "1" ]]; then
+	curl -L -o tesuteru https://github.com/Barysk/testownik_cli/releases/download/ver1.0.1/tesuteru
+	chmod +x tesuteru
+	sudo mv tesuteru /usr/local/bin/
+fi
+
+if [[ "$TOOLS" == "1" ]]; then
+	git clone https://github.com/Barysk/tools
+	cd tools/
+	./build_tools.bash
+	./install.bash
+	cd $RST_PATH
 fi
 
 echo "$SEPARATOR"
