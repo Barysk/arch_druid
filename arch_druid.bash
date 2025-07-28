@@ -199,6 +199,7 @@ PARU_PACKAGES=(
 	blockbench-bin
 	vesktop-bin
 	xpadneo-dkms
+	localsend-bin
 )
 
 SEPARATOR='
