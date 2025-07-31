@@ -10,6 +10,30 @@ is done.
 ver2025.07.27
 bk"
 
+MSG_BYE_X='What now?
+1. Use [ xrandr ] to get the name of your monitor and write it to $HOME/.xinitrc, also set set correct resolution and frame rate. You can xhange wallpaper by changing WALPAPER_PATH.
+2. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is
+turned off by default
+3. Eduroam? Yeah, you need to enable legacy support
+Check connection details first with your institution before applying any
+profiles listed in this section. Example profiles are not guaranteed to work or
+match any security requirements.
+When storing connection profiles unencrypted, it is recommended to restrict
+read access to the root account by specifying chmod 600 profile as root.
+If authentication keeps failing with NetworkManager, try setting
+phase1-auth-flags=32 for TLS 1.0 or phase1-auth-flags=64 for TLS 1.1, as
+described in [2] and NetworkManager#WPA Enterprise connections fail to
+authenticate with OpenSSL "unsupported protocol" error.
+
+Links:
+> Wiki
+  https://wiki.archlinux.org/title/Network_configuration/Wireless
+> NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL
+"unsupported protocol" error
+  https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+> Eduroam Configuration Assistant Tool
+  https://cat.eduroam.org/'
+
 MSG_BYE='What now?
 1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to
 $HOME/.config/hypr/hyprvars.conf in the default_monitor
@@ -424,7 +448,7 @@ elif [ "$SESSION" = "dwm" ]; then
 	mv dot_dwm/dot_bash_profile $HOME/.bash_profile
 	mv dot_dwm/dot_xinitrc $HOME/.xinitrc
 	echo "Installing DWM"
-	cd .config/suckless/dwm
+	cd $HOME.config/suckless/dwm
 	sudo make clean install
 	cd ../dwmblocks
 	sudo make clean install
@@ -547,9 +571,14 @@ echo "$SEPARATOR"
 
 echo "All done!"
 echo ""
-echo "$MSG_BYE"
 
-echo "$MSG_BYE" > "$AFTER_INSTALL_INSTRUCTIONS"
+if [ "$SESSION" = "hyprland" ]; then
+	echo "$MSG_BYE"
+	echo "$MSG_BYE" > "$AFTER_INSTALL_INSTRUCTIONS"
+elif [ "$SESSION" = "dwm" ]; then
+	echo "$MSG_BYE_X"
+	echo "$MSG_BYE_X" > "$AFTER_INSTALL_INSTRUCTIONS"
+fi
 
 echo "those instructions are saved to $AFTER_INSTALL_INSTRUCTIONS"
 echo ""
