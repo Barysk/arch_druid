@@ -7,11 +7,12 @@ He will install my dotfiles and the applications I use.
 You will be prompted with some queries thus Please don't leave until the Druid
 is done.
 
-ver2025.07.27
+ver2025.07.31
 bk"
 
-MSG_BYE_X='What now?
-1. Use [ xrandr ] to get the name of your monitor and write it to $HOME/.xinitrc, also set set correct resolution and frame rate. You can xhange wallpaper by changing WALPAPER_PATH.
+MSG_BYE='What now?
+1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to
+$HOME/.config/hypr/hyprvars.conf in the default_monitor
 2. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is
 turned off by default
 3. Eduroam? Yeah, you need to enable legacy support
@@ -34,9 +35,8 @@ Links:
 > Eduroam Configuration Assistant Tool
   https://cat.eduroam.org/'
 
-MSG_BYE='What now?
-1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to
-$HOME/.config/hypr/hyprvars.conf in the default_monitor
+MSG_BYE_X='What now?
+1. Use [ xrandr ] to get the name of your monitor and write it to $HOME/.xinitrc, also set set correct resolution and frame rate. You can xhange wallpaper by changing WALPAPER_PATH.
 2. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is
 turned off by default
 3. Eduroam? Yeah, you need to enable legacy support
