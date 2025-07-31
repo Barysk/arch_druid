@@ -41,16 +41,17 @@ AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
 GPU_VENDOR=""
 
 # OPTIONAL
+SESSION="hyprland"
 STEAM="0"
 MINECRAFT="0"
 EMULATORS="0"
-LATEX="0"
 
+LATEX="0"
 ASEPRITE="0"
 BETTERBIRD="0"
 NEOTHESIA="0"
-RUST="0"
 
+RUST="0"
 REIHA="0"
 TESUTERU="0"
 TOOLS="0"
@@ -79,6 +80,34 @@ BASE_PACKAGES=(
 	linux-zen-headers
 )
 
+HYPR_SESSION=(
+	wayland
+	uwsm
+	hyprland
+	xdg-desktop-portal-gtk
+	xdg-desktop-portal-hyprland
+	wl-clipboard
+	hyprlock
+	hyprpolkitagent
+	hyprshot
+	hyprsunset
+	mako
+	swww
+	waybar
+	qt5-wayland
+	imv
+	tofi #paru
+)
+
+DWM_SESSION=(
+	xorg-xinit
+	dmenu
+	picom
+	feh
+	dunst
+	betterlockscreen #paru
+)
+
 PACMAN_PACKAGES=(
 	# Terminal
 	bat
@@ -100,35 +129,18 @@ PACMAN_PACKAGES=(
 	tree-sitter-cli
 	udisks2
 
-	# Display 
-	xorg
-	wayland
-	uwsm
-	hyprland
-	xdg-desktop-portal-gtk
-	xdg-desktop-portal-hyprland
-
 	# Base
+	xorg
 	lib32-mesa
 	xf86-video-vesa
 	networkmanager
-	wl-clipboard
 	bluez
 	bluez-utils
 	thermald
-
-	# Hyprland things
 	brightnessctl
-	hyprlock
-	hyprpolkitagent
-	hyprshot
-	hyprsunset
-	mako
 	network-manager-applet
 	playerctl
 	redshift
-	swww
-	waybar
 
 	# Development
 	clang
@@ -140,7 +152,6 @@ PACMAN_PACKAGES=(
 	# Applications
 	audacity
 	carla
-	imv
 	krita
 	lutris
 	mpv
@@ -181,7 +192,6 @@ PACMAN_PACKAGES=(
 	gtk4
 	qt6ct
 	qt5ct
-	qt5-wayland
 	papirus-icon-theme
 	materia-gtk-theme
 	nwg-look
@@ -189,7 +199,6 @@ PACMAN_PACKAGES=(
 )
 
 PARU_PACKAGES=(
-	tofi
 	auto-cpufreq
 	bluetuith-bin
 	brave-bin
@@ -243,6 +252,14 @@ echo "$SEPARATOR"
 
 echo "$GPU_VENDOR chosen"
 echo "needed drivers will be installed"
+echo "$SEPARATOR"
+
+
+echo "Use DWM instead Hyprland?"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	SESSION="dwm"
+fi
 echo "$SEPARATOR"
 
 
@@ -366,7 +383,11 @@ echo "$SEPARATOR"
 
 
 echo "downloading dotfiles"
-git clone https://github.com/barysk/dot_hyprland
+if [ "$SESSION" = "hyprland" ]; then
+    git clone https://github.com/barysk/dot_hyprland
+elif [ "$SESSION" = "dwm" ]; then
+    git clone https://github.com/barysk/dot_dwm
+fi
 git clone https://github.com/barysk/nvim
 echo "$SEPARATOR"
 
@@ -384,13 +405,31 @@ cd nvim
 rm -rf .git
 cd $RST_PATH
 mv nvim $HOME/.config/
-# hypr
-cd dot_hyprland
-rm -rf .git
-cd $RST_PATH
-mv dot_hyprland/dot_config/* $HOME/.config/
-mv dot_hyprland/dot_fonts $HOME/.fonts
-mv dot_hyprland/dot_bashrc $HOME/.bashrc
+# hypr || dwm
+if [ "$SESSION" = "hyprland" ]; then
+	cd dot_hyprland
+	rm -rf .git
+	cd $RST_PATH
+	mv dot_hyprland/dot_config/* $HOME/.config/
+	mv dot_hyprland/dot_fonts $HOME/.fonts
+	mv dot_hyprland/dot_bashrc $HOME/.bashrc
+	mv dot_hyprland/dot_bash_profile $HOME/.bash_profile
+elif [ "$SESSION" = "dwm" ]; then
+	cd dot_dwm
+	rm -rf .git
+	cd $RST_PATH
+	mv dot_dwm/dot_config/* $HOME/.config/
+	mv dot_dwm/dot_fonts $HOME/.fonts
+	mv dot_dwm/dot_bashrc $HOME/.bashrc
+	mv dot_dwm/dot_bash_profile $HOME/.bash_profile
+	mv dot_dwm/dot_xinitrc $HOME/.xinitrc
+	echo "Installing DWM"
+	cd .config/suckless/dwm
+	sudo make clean install
+	cd ../dwmblocks
+	sudo make clean install
+	cd $RST_PATH
+fi
 echo "$SEPARATOR"
 
 
@@ -407,6 +446,13 @@ case "$GPU_VENDOR" in
 		;;
 esac
 echo "$SEPARATOR"
+
+
+if [ "$SESSION" = "hyprland" ]; then
+	paru -S --needed "${HYPR_SESSION[@]}"
+elif [ "$SESSION" = "dwm" ]; then
+	paru -S --needed "${DWM_SESSION[@]}"
+fi
 
 
 echo "Installing packages using pacman"
