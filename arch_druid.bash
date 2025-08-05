@@ -134,6 +134,7 @@ RIVER_SESSION=(
 	xdg-desktop-portal-wlr
 	xdg-desktop-portal-gtk
 	wl-clipboard
+	wlr-randr
 	hyprpolkitagent
 	hyprlock
 	hyprshot
