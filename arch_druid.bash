@@ -7,8 +7,31 @@ He will install my dotfiles and the applications I use.
 You will be prompted with some queries thus Please don't leave until the Druid
 is done.
 
-ver2025.07.31
+ver2025.08.05
 bk"
+
+MSG_BYE_R='What now?
+1. Go to /etc/bluetooth/main.conf and set AutoEnable=false so that Bluetooth is
+turned off by default
+2. Eduroam? Yeah, you need to enable legacy support
+Check connection details first with your institution before applying any
+profiles listed in this section. Example profiles are not guaranteed to work or
+match any security requirements.
+When storing connection profiles unencrypted, it is recommended to restrict
+read access to the root account by specifying chmod 600 profile as root.
+If authentication keeps failing with NetworkManager, try setting
+phase1-auth-flags=32 for TLS 1.0 or phase1-auth-flags=64 for TLS 1.1, as
+described in [2] and NetworkManager#WPA Enterprise connections fail to
+authenticate with OpenSSL "unsupported protocol" error.
+
+Links:
+> Wiki
+  https://wiki.archlinux.org/title/Network_configuration/Wireless
+> NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL
+"unsupported protocol" error
+  https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+> Eduroam Configuration Assistant Tool
+  https://cat.eduroam.org/'
 
 MSG_BYE='What now?
 1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to
@@ -62,10 +85,10 @@ Links:
 TMP_FOLDER="arch_druid"
 RST_PATH="$HOME/$TMP_FOLDER"
 AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
+SESSION="river"
 GPU_VENDOR=""
 
 # OPTIONAL
-SESSION="hyprland"
 STEAM="0"
 MINECRAFT="0"
 EMULATORS="0"
@@ -102,6 +125,24 @@ BASE_PACKAGES=(
 	base
 	base-devel
 	linux-zen-headers
+	linux-lts-headers
+)
+
+RIVER_SESSION=(
+	wayland
+	river
+	xdg-desktop-portal-wlr
+	xdg-desktop-portal-gtk
+	wl-clipboard
+	hyprpolkitagent
+	hyprlock
+	hyprshot
+	mako
+	swaybg
+	waybar
+	imv
+	tofi
+	qt5-wayland
 )
 
 HYPR_SESSION=(
@@ -279,13 +320,29 @@ echo "needed drivers will be installed"
 echo "$SEPARATOR"
 
 
-echo "Use DWM instead Hyprland?"
-read -rp "[ Y/n ]: " choice
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-	SESSION="dwm"
-fi
+echo "1) River"
+echo "2) Hyprland"
+echo "3) DWM"
+read -rp "Choice (1-3): " choice
+case "$choice" in
+	1)
+		SESSION="river"
+		;;
+	2)
+		SESSION="hyprland"
+		;;
+	3)
+		SESSION="dwm"
+		;;
+	*)
+		echo "Invalid choice. Exiting."
+		exit 1
+		;;
+esac
 echo "$SEPARATOR"
 
+echo "$SESSION chosen"
+echo "$SEPARATOR"
 
 echo "Install steam?"
 read -rp "[ Y/n ]: " choice
@@ -407,11 +464,21 @@ echo "$SEPARATOR"
 
 
 echo "downloading dotfiles"
-if [ "$SESSION" = "hyprland" ]; then
-    git clone https://github.com/barysk/dot_hyprland
-elif [ "$SESSION" = "dwm" ]; then
-    git clone https://github.com/barysk/dot_dwm
-fi
+case "$SESSION" in
+	river)
+		git clone https://github.com/barysk/dot_river
+		;;
+	hyprland)
+		git clone https://github.com/barysk/dot_hyprland
+		;;
+	dwm)
+		git clone https://github.com/barysk/dot_dwm
+		;;
+	*)
+		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
+		exit 1
+		;;
+esac
 git clone https://github.com/barysk/nvim
 echo "$SEPARATOR"
 
@@ -429,31 +496,64 @@ cd nvim
 rm -rf .git
 cd $RST_PATH
 mv nvim $HOME/.config/
-# hypr || dwm
-if [ "$SESSION" = "hyprland" ]; then
-	cd dot_hyprland
-	rm -rf .git
-	cd $RST_PATH
-	mv dot_hyprland/dot_config/* $HOME/.config/
-	mv dot_hyprland/dot_fonts $HOME/.fonts
-	mv dot_hyprland/dot_bashrc $HOME/.bashrc
-	mv dot_hyprland/dot_bash_profile $HOME/.bash_profile
-elif [ "$SESSION" = "dwm" ]; then
-	cd dot_dwm
-	rm -rf .git
-	cd $RST_PATH
-	mv dot_dwm/dot_config/* $HOME/.config/
-	mv dot_dwm/dot_fonts $HOME/.fonts
-	mv dot_dwm/dot_bashrc $HOME/.bashrc
-	mv dot_dwm/dot_bash_profile $HOME/.bash_profile
-	mv dot_dwm/dot_xinitrc $HOME/.xinitrc
-	echo "Installing DWM"
-	cd $HOME.config/suckless/dwm
-	sudo make clean install
-	cd ../dwmblocks
-	sudo make clean install
-	cd $RST_PATH
-fi
+# river || hypr || dwm
+case "$SESSION" in
+	river)
+		cd dot_river
+		rm -rf .git
+		chmod +x ./deploy.bash
+		./deploy.bash
+		cd $RST_PATH
+		;;
+	hyprland)
+		cd dot_hyprland
+		rm -rf .git
+		cd $RST_PATH
+
+		cp -rf dot_hyprland/dot_bashrc $HOME/.bashrc
+		cp -rf dot_hyprland/dot_bash_profile $HOME/.bash_profile
+
+		if [ ! -d $HOME/.config ]; then
+			mkdir -p $HOME/.config
+		fi
+		cp -rf dot_hyprland/dot_config/* $HOME/.config/
+
+		if [ ! -d $HOME/.fonts ]; then
+			mkdir -p $HOME/.fonts
+		fi
+		cp -rf dot_hyprland/dot_fonts/* $HOME/.fonts
+		;;
+	dwm)
+		cd dot_dwm
+		rm -rf .git
+		cd $RST_PATH
+
+		cp -rf dot_dwm/dot_bashrc $HOME/.bashrc
+		cp -rf dot_dwm/dot_bash_profile $HOME/.bash_profile
+		cp -rf dot_dwm/dot_xinitrc $HOME/.xinitrc
+
+		if [ ! -d $HOME/.config ]; then
+			mkdir -p $HOME/.config
+		fi
+		cp -rf dot_dwm/dot_config/* $HOME/.config/
+
+		if [ ! -d $HOME/.fonts ]; then
+			mkdir -p $HOME/.fonts
+		fi
+		cp -rf dot_dwm/dot_fonts $HOME/.fonts
+
+		echo "Installing DWM"
+		cd $HOME.config/suckless/dwm
+		sudo make clean install
+		cd ../dwmblocks
+		sudo make clean install
+		cd $RST_PATH
+		;;
+	*)
+		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
+		exit 1
+		;;
+esac
 echo "$SEPARATOR"
 
 
@@ -472,11 +572,22 @@ esac
 echo "$SEPARATOR"
 
 
-if [ "$SESSION" = "hyprland" ]; then
-	paru -S --needed "${HYPR_SESSION[@]}"
-elif [ "$SESSION" = "dwm" ]; then
-	paru -S --needed "${DWM_SESSION[@]}"
-fi
+case "$SESSION" in
+	river)
+		paru -S --needed "${RIVER_SESSION[@]}"
+		;;
+	hyprland)
+		paru -S --needed "${HYPR_SESSION[@]}"
+		;;
+	dwm)
+		paru -S --needed "${DWM_SESSION[@]}"
+		;;
+	*)
+		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
+		exit 1
+		;;
+esac
+echo "$SEPARATOR"
 
 
 echo "Installing packages using pacman"
@@ -572,13 +683,24 @@ echo "$SEPARATOR"
 echo "All done!"
 echo ""
 
-if [ "$SESSION" = "hyprland" ]; then
-	echo "$MSG_BYE"
-	echo "$MSG_BYE" > "$AFTER_INSTALL_INSTRUCTIONS"
-elif [ "$SESSION" = "dwm" ]; then
-	echo "$MSG_BYE_X"
-	echo "$MSG_BYE_X" > "$AFTER_INSTALL_INSTRUCTIONS"
-fi
+case "$SESSION" in
+	river)
+		echo "$MSG_BYE_R"
+		echo "$MSG_BYE_R" > "$AFTER_INSTALL_INSTRUCTIONS"
+	;;
+	hyprland)
+		echo "$MSG_BYE"
+		echo "$MSG_BYE" > "$AFTER_INSTALL_INSTRUCTIONS"
+		;;
+	dwm)
+		echo "$MSG_BYE_X"
+		echo "$MSG_BYE_X" > "$AFTER_INSTALL_INSTRUCTIONS"
+		;;
+	*)
+		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
+		exit 1
+		;;
+esac
 
 echo "those instructions are saved to $AFTER_INSTALL_INSTRUCTIONS"
 echo ""
