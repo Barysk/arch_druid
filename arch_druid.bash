@@ -158,7 +158,7 @@ HYPR_SESSION=(
 	hyprshot
 	hyprsunset
 	mako
-	swww
+	swaybg
 	waybar
 	qt5-wayland
 	imv
@@ -608,13 +608,6 @@ fi
 
 if [[ "$RUST" == "1" ]]; then
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-	if ! grep -Fq 'source "$HOME/.cargo/env"' "$HOME/.bashrc"; then
-		echo "" >> "$HOME/.bashrc"
-		echo "# For Rust" >> "$HOME/.bashrc"
-		echo 'source "$HOME/.cargo/env"' >> "$HOME/.bashrc"
-		echo "\$HOME/.cargo/env added to $HOME/.bashrc"
-	fi
 fi
 
 echo "$SEPARATOR"
