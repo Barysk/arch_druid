@@ -7,7 +7,7 @@ He will install my dotfiles and the applications I use.
 You will be prompted with some queries thus Please don't leave until the Druid
 is done.
 
-ver2025.08.05
+ver2025.08.08
 bk"
 
 MSG_BYE_R='What now?
@@ -85,7 +85,7 @@ Links:
 TMP_FOLDER="arch_druid"
 RST_PATH="$HOME/$TMP_FOLDER"
 AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
-SESSION="river"
+SESSION="dwl"
 GPU_VENDOR=""
 
 # OPTIONAL
@@ -128,6 +128,23 @@ BASE_PACKAGES=(
 	linux-lts-headers
 )
 
+DWL_SESSION=(
+	wayland
+	xdg-desktop-portal-wlr
+	xdg-desktop-portal-gtk
+	wl-clipboard
+	wlr-randr
+	hyprpolkitagent
+	swaylock-effects-git # aur
+	mako
+	swaybg
+	waybar
+	imv
+	tofi # aur
+	qt5-wayland
+	qt6-wayland
+)
+
 RIVER_SESSION=(
 	wayland
 	river
@@ -142,8 +159,9 @@ RIVER_SESSION=(
 	swaybg
 	waybar
 	imv
-	tofi
+	tofi # aur
 	qt5-wayland
+	qt6-wayland
 )
 
 HYPR_SESSION=(
@@ -161,6 +179,7 @@ HYPR_SESSION=(
 	swaybg
 	waybar
 	qt5-wayland
+	qt6-wayland
 	imv
 	tofi #paru
 )
@@ -321,18 +340,23 @@ echo "needed drivers will be installed"
 echo "$SEPARATOR"
 
 
-echo "1) River"
-echo "2) Hyprland"
-echo "3) DWM"
-read -rp "Choice (1-3): " choice
+echo "Choose Session Type"
+echo "1) DWL"
+echo "2) River"
+echo "3) Hyprland"
+echo "4) DWM"
+read -rp "Choice (1-4): " choice
 case "$choice" in
 	1)
-		SESSION="river"
+		SESSION="dwl"
 		;;
 	2)
-		SESSION="hyprland"
+		SESSION="river"
 		;;
 	3)
+		SESSION="hyprland"
+		;;
+	4)
 		SESSION="dwm"
 		;;
 	*)
@@ -466,6 +490,9 @@ echo "$SEPARATOR"
 
 echo "downloading dotfiles"
 case "$SESSION" in
+	dwl)
+		git clone https://github.com/barysk/dot_dwl
+		;;
 	river)
 		git clone https://github.com/barysk/dot_river
 		;;
@@ -499,6 +526,13 @@ cd $RST_PATH
 mv nvim $HOME/.config/
 # river || hypr || dwm
 case "$SESSION" in
+	dwl)
+		cd dot_dwl
+		rm -rf .git
+		chmod +x ./deploy.sh
+		./deploy.sh
+		cd $RST_PATH
+		;;
 	river)
 		cd dot_river
 		rm -rf .git
@@ -574,6 +608,9 @@ echo "$SEPARATOR"
 
 
 case "$SESSION" in
+	dwl)
+		paru -S --needed "${DWL_SESSION[@]}"
+		;;
 	river)
 		paru -S --needed "${RIVER_SESSION[@]}"
 		;;
@@ -673,11 +710,18 @@ echo "setting up auto-cpufreq"
 sudo auto-cpufreq --install
 echo "$SEPARATOR"
 
+echo "enabling bluetooth.service"
+sudo systemctl enable --now bluetooth.service
+echo "$SEPARATOR"
 
 echo "All done!"
 echo ""
 
 case "$SESSION" in
+	dwl)
+		echo "$MSG_BYE_R"
+		echo "$MSG_BYE_R" > "$AFTER_INSTALL_INSTRUCTIONS"
+	;;
 	river)
 		echo "$MSG_BYE_R"
 		echo "$MSG_BYE_R" > "$AFTER_INSTALL_INSTRUCTIONS"
