@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Script that auto configures and installs all software I use on my arch ;)
 # shebang!
 
@@ -7,7 +7,7 @@ He will install my dotfiles and the applications I use.
 You will be prompted with some queries thus Please don't leave until the Druid
 is done.
 
-ver2025.08.08
+ver2025.08.09
 bk"
 
 MSG_BYE_R='What now?
@@ -154,7 +154,8 @@ RIVER_SESSION=(
 	wlr-randr
 	hyprpolkitagent
 	hyprlock
-	hyprshot
+	grim
+	slurp
 	mako
 	swaybg
 	waybar
@@ -173,7 +174,8 @@ HYPR_SESSION=(
 	wl-clipboard
 	hyprlock
 	hyprpolkitagent
-	hyprshot
+	grim
+	slurp
 	hyprsunset
 	mako
 	swaybg
