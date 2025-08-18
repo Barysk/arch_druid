@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Script that auto configures and installs all software I use on my arch ;)
 # shebang!
 
@@ -7,7 +8,7 @@ He will install my dotfiles and the applications I use.
 You will be prompted with some queries thus Please don't leave until the Druid
 is done.
 
-ver2025.08.09
+ver2025.08.18
 bk"
 
 MSG_BYE_R='What now?
@@ -26,12 +27,12 @@ authenticate with OpenSSL "unsupported protocol" error.
 
 Links:
 > Wiki
-  https://wiki.archlinux.org/title/Network_configuration/Wireless
+https://wiki.archlinux.org/title/Network_configuration/Wireless
 > NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL
 "unsupported protocol" error
-  https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
 > Eduroam Configuration Assistant Tool
-  https://cat.eduroam.org/'
+https://cat.eduroam.org/'
 
 MSG_BYE='What now?
 1. Use [ hyprctl monitors all ] to get the name of your monitor and write it to
@@ -51,12 +52,12 @@ authenticate with OpenSSL "unsupported protocol" error.
 
 Links:
 > Wiki
-  https://wiki.archlinux.org/title/Network_configuration/Wireless
+https://wiki.archlinux.org/title/Network_configuration/Wireless
 > NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL
 "unsupported protocol" error
-  https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
 > Eduroam Configuration Assistant Tool
-  https://cat.eduroam.org/'
+https://cat.eduroam.org/'
 
 MSG_BYE_X='What now?
 1. Use [ xrandr ] to get the name of your monitor and write it to $HOME/.xinitrc, also set set correct resolution and frame rate. You can xhange wallpaper by changing WALPAPER_PATH.
@@ -75,17 +76,17 @@ authenticate with OpenSSL "unsupported protocol" error.
 
 Links:
 > Wiki
-  https://wiki.archlinux.org/title/Network_configuration/Wireless
+https://wiki.archlinux.org/title/Network_configuration/Wireless
 > NetworkManager#WPA Enterprise connections fail to authenticate with OpenSSL
 "unsupported protocol" error
-  https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
+https://wiki.archlinux.org/title/NetworkManager#WPA_Enterprise_connections_fail_to_authenticate_with_OpenSSL_%22unsupported_protocol%22_error
 > Eduroam Configuration Assistant Tool
-  https://cat.eduroam.org/'
+https://cat.eduroam.org/'
 
 TMP_FOLDER="arch_druid"
 RST_PATH="$HOME/$TMP_FOLDER"
 AFTER_INSTALL_INSTRUCTIONS="$HOME/AAC_WHAT_NOW.txt"
-SESSION="dwl"
+SESSION="none"
 GPU_VENDOR=""
 
 # OPTIONAL
@@ -343,6 +344,7 @@ echo "$SEPARATOR"
 
 
 echo "Choose Session Type"
+echo "Leave empty for none"
 echo "1) DWL"
 echo "2) River"
 echo "3) Hyprland"
@@ -362,8 +364,7 @@ case "$choice" in
 		SESSION="dwm"
 		;;
 	*)
-		echo "Invalid choice. Exiting."
-		exit 1
+		SESSION="none"
 		;;
 esac
 echo "$SEPARATOR"
@@ -505,8 +506,7 @@ case "$SESSION" in
 		git clone https://github.com/barysk/dot_dwm
 		;;
 	*)
-		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
-		exit 1
+		echo "SESSION chosen: $SESSION"
 		;;
 esac
 git clone https://github.com/barysk/nvim
@@ -587,8 +587,7 @@ case "$SESSION" in
 		cd $RST_PATH
 		;;
 	*)
-		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
-		exit 1
+		echo "SESSION chosen: $SESSION"
 		;;
 esac
 echo "$SEPARATOR"
@@ -623,8 +622,7 @@ case "$SESSION" in
 		paru -S --needed "${DWM_SESSION[@]}"
 		;;
 	*)
-		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
-		exit 1
+		echo "SESSION chosen: $SESSION"
 		;;
 esac
 echo "$SEPARATOR"
@@ -712,9 +710,16 @@ echo "setting up auto-cpufreq"
 sudo auto-cpufreq --install
 echo "$SEPARATOR"
 
+
 echo "enabling bluetooth.service"
 sudo systemctl enable --now bluetooth.service
 echo "$SEPARATOR"
+
+
+echo "setting pcmanfm as a deafault file explorer"
+xdg-mime default pcmanfm.desktop inode/directory
+echo "$SEPARATOR"
+
 
 echo "All done!"
 echo ""
@@ -723,11 +728,11 @@ case "$SESSION" in
 	dwl)
 		echo "$MSG_BYE_R"
 		echo "$MSG_BYE_R" > "$AFTER_INSTALL_INSTRUCTIONS"
-	;;
+		;;
 	river)
 		echo "$MSG_BYE_R"
 		echo "$MSG_BYE_R" > "$AFTER_INSTALL_INSTRUCTIONS"
-	;;
+		;;
 	hyprland)
 		echo "$MSG_BYE"
 		echo "$MSG_BYE" > "$AFTER_INSTALL_INSTRUCTIONS"
@@ -737,8 +742,8 @@ case "$SESSION" in
 		echo "$MSG_BYE_X" > "$AFTER_INSTALL_INSTRUCTIONS"
 		;;
 	*)
-		echo "Something went wrong. Incorrect SESSION chosen: $SESSION"
-		exit 1
+		echo "$MSG_BYE_R"
+		echo "$MSG_BYE_R" > "$AFTER_INSTALL_INSTRUCTIONS"
 		;;
 esac
 
