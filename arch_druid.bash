@@ -144,6 +144,7 @@ DWL_SESSION=(
 	tofi # aur
 	qt5-wayland
 	qt6-wayland
+	qt6ct
 )
 
 RIVER_SESSION=(
@@ -164,6 +165,7 @@ RIVER_SESSION=(
 	tofi # aur
 	qt5-wayland
 	qt6-wayland
+	qt6ct
 )
 
 HYPR_SESSION=(
@@ -178,11 +180,13 @@ HYPR_SESSION=(
 	grim
 	slurp
 	hyprsunset
+ 	hyprpicker
 	mako
 	swaybg
 	waybar
 	qt5-wayland
 	qt6-wayland
+	hyprqt6engine-git
 	imv
 	tofi #paru
 )
@@ -194,6 +198,7 @@ DWM_SESSION=(
 	feh
 	dunst
 	betterlockscreen #paru
+	qt6ct
 )
 
 PACMAN_PACKAGES=(
@@ -278,8 +283,6 @@ PACMAN_PACKAGES=(
 	# Theming
 	gtk3
 	gtk4
-	qt6ct
-	qt5ct
 	papirus-icon-theme
 	materia-gtk-theme
 	nwg-look
