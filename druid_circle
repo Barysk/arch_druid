@@ -1,0 +1,522 @@
+#!/usr/bin/env bash
+
+### INFO #######################################################################
+### Recuirements: multilib enabled, internet conection is present.
+### Feel free to modify script according to your needs.
+### Script written using STRUCTURED paradigm with no jumps.
+### Script uses autoconfig scripts provided in my other repos e.g. dot_hyprland.
+### Script is designed for a fresh install with little preconfiguration, examine
+###   before using in non-fresh environment due to possible overwriting.
+########################################################## 2025-11-30 ### bk ###
+
+### OPTIONAL ###################################################################
+### set 1 if you want to install something from this list, if you want to add
+### something that is not here -> add to APPLICATIONS list
+
+STEAM="0"     # steam
+MINECRAFT="0" # prismlauncher
+EMULATORS="0" # pcsx2, rpcs3, xnp2
+
+LATEX="0"      # texlive, biber
+ASEPRITE="0"   # aseprite (compile from AUR)
+BETTERBIRD="0" # betterbird-bin
+NEOTHESIA="0"  # neothesia (compile from AUR)
+
+RUST="0"     # rust
+REIHA="0"    # reiha (tool for presentations)
+TESUTERU="0" # testownik-cli (alternative for testownik)
+TOOLS="0"    # simple cli tools (like stopwatch, timer etc.)
+
+################################################################################
+
+### VARIABLES ##################################################################
+### only modify if you know what you are doing
+
+TMP_FOLDER="arch_druid_temp_folder"
+RST_PATH="$HOME/$TMP_FOLDER"
+SESSION="none"
+GPU_VENDOR="none"
+
+### GPU
+INTEL_PACKAGES=(
+	vulkan-intel
+	lib32-vulkan-intel
+	xf86-video-intel
+)
+
+AMD_PACKAGES=(
+	vulkan-radeon
+	lib32-vulkan-radeon
+	xf86-video-amdgpu
+)
+
+NVIDIA_PACKAGES=(
+	nvidia-open-dkms
+	nvidia-utils
+	lib32-nvidia-utils
+)
+
+### BASE
+BASE_PACKAGES=(
+	base
+	base-devel
+	linux-zen-headers
+	linux-lts-headers
+)
+
+### SESSION
+# TODO add river and dwm
+HYPR_SESSION=(
+	wayland
+	xorg-xwayland
+	uwsm
+	hyprland
+	xdg-desktop-portal-gtk
+	xdg-desktop-portal-hyprland
+	wl-clipboard
+	hyprlock
+	hyprpolkitagent
+	grim
+	slurp
+	hyprsunset
+ 	hyprpicker
+	mako
+	swaybg
+	waybar
+	qt5-wayland
+	qt6-wayland
+	hyprqt6engine-git
+	imv
+	tofi
+)
+
+### Other
+TERMINAL=(
+	bat
+	btop
+	dust
+	fastfetch
+	fzf
+	github-cli
+	htop
+	imagemagick
+	jp2a
+	kitty
+	man-db
+	neovim
+	ripgrep
+	tldr
+	tmux
+	tree
+	tree-sitter-cli
+	udisks2
+)
+
+BASIC=(
+	lib32-mesa
+	networkmanager
+	bluez
+	bluez-utils
+	xpadneo-dkms
+	thermald
+	auto-cpufreq
+	brightnessctl
+	network-manager-applet
+	playerctl
+	redshift
+)
+
+DEVELOPMENT=(
+	clang
+	odin
+	raylib
+	docker
+	electron
+)
+
+APPLICATIONS=(
+	audacity
+	carla
+	krita
+	lutris
+	mpv
+	obs-studio
+	pavucontrol
+	pcmanfm-gtk3
+	qbittorrent
+	qutebrowser
+	reaper
+	shotcut
+	tailscale
+	telegram-desktop
+	zathura
+	zathura-pdf-mupdf
+	bluetuith-bin
+	proton-ge-custom-bin
+	anki-bin
+	blockbench-bin
+	vesktop-bin
+	localsend-bin
+)
+
+SOUND=(
+	wireplumber
+	qjackctl
+	alsa-utils
+	pipewire
+	lib32-pipewire
+	pipewire-alsa
+	lib32-alsa-plugins
+	pipewire-jack
+	lib32-pipewire-jack
+	pipewire-pulse
+	gst-plugin-pipewire
+	timidity++
+	freepats-general-midi
+	sof-firmware
+)
+
+WINE=(
+	wine-staging
+	wine-mono
+)
+
+THEMING=(
+	gtk3
+	gtk4
+	papirus-icon-theme
+	materia-gtk-theme
+	nwg-look
+	kvantum
+)
+
+BROWSERS=(
+	brave-bin
+	librewolf-bin
+)
+
+SEPARATOR='
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+'
+################################################################################
+
+### SCRIPT INIT ################################################################
+echo "Prerequisites: You have a minimal Arch Linux install with the linux-zen kernel"
+echo "$SEPARATOR"
+
+
+printf  "%s\n%s\n%s\n%s\n" \
+	"Your GPU?" \
+	"1) INTEL [thinkpad x220]" \
+	"2) AMD [thinkpad t14]" \
+	"3) NVIDIA TURING+ [acer NITRO RTX 3060]"
+read -rp "Choice (1-3): " choice
+
+case "$choice" in
+	1)
+		GPU_VENDOR="intel"
+		;;
+	2)
+		GPU_VENDOR="amd"
+		;;
+	3)
+		GPU_VENDOR="nvidia"
+		;;
+	*)
+		echo "Invalid choice. Exiting."
+		exit 1
+		;;
+esac
+echo "$SEPARATOR"
+
+
+printf  "%s\n%s\n" \
+	"$GPU_VENDOR chosen" \
+	"needed drivers will be installed"
+echo "$SEPARATOR"
+
+
+printf  "%s\n%s\n%s\n" \
+	"Choose Session Type" \
+	"Leave empty for none" \
+	"1) Hyprland"
+read -rp "Choice: " choice
+
+case "$choice" in
+	1)
+		SESSION="hyprland"
+		;;
+	*)
+		SESSION="none"
+		;;
+esac
+echo "$SEPARATOR"
+
+echo "$SESSION chosen"
+echo "$SEPARATOR"
+################################################################################
+
+### SCRIPT INIT ################################################################
+printf "%s" "Druid (druidname) will begin begun a ritual in..."
+sleep 1
+printf "%s" "5.."
+sleep 1
+printf "%s" "4.."
+sleep 1
+printf "%s" "3.."
+sleep 1
+printf "%s" "2.."
+sleep 1
+printf "%s\n" "1.."
+sleep 1
+echo "$SEPARATOR"
+
+
+cd $HOME
+echo "creating temporary $TMP_FOLDER at $HOME"
+mkdir $TMP_FOLDER
+cd $RST_PATH
+echo "$SEPARATOR"
+
+
+echo "updating system"
+sudo pacman -Syu
+echo "$SEPARATOR"
+
+
+echo "ensuring base are installed"
+sudo pacman -S --needed $BASE_PACKAGES
+echo "$SEPARATOR"
+
+
+echo "installing git if absent"
+sudo pacman -S --needed git
+echo "$SEPARATOR"
+
+
+echo "downloading paru-bin"
+git clone https://aur.archlinux.org/paru-bin.git
+echo "$SEPARATOR"
+
+
+echo "downloading dotfiles"
+case "$SESSION" in
+	hyprland)
+		git clone https://github.com/barysk/dot_hyprland
+		;;
+	*)
+		echo "No session since SESSION = $SESSION"
+		;;
+esac
+git clone https://github.com/barysk/nvim
+echo "$SEPARATOR"
+
+
+echo "installing paru-bin"
+cd paru-bin
+makepkg -sri
+cd $RST_PATH
+echo "$SEPARATOR"
+
+
+echo "applying dotfiles"
+# nvim
+cd nvim
+rm -rf .git
+cd $RST_PATH
+mv nvim $HOME/.config/
+# hyprland | ...
+case "$SESSION" in
+	hyprland)
+		cd dot_hyprland
+		./autoconf deploy
+		cd $RST_PATH
+		;;
+	*) echo 
+		echo "No session since SESSION = $SESSION"
+		;;
+esac
+
+
+echo "Installing GPU drivers"
+case "$GPU_VENDOR" in
+	intel)
+		sudo paru -S --needed "${INTEL_PACKAGES[@]}"
+		;;
+	amd)
+		sudo paru -S --needed "${AMD_PACKAGES[@]}"
+		;;
+	nvidia)
+		sudo paru -S --needed "${NVIDIA_PACKAGES[@]}"
+		;;
+esac
+echo "$SEPARATOR"
+
+
+echo "Installing session needed packages"
+case "$SESSION" in
+	hyprland)
+		paru -S --needed "${HYPR_SESSION[@]}"
+		;;
+	*)
+		echo "No session since SESSION = $SESSION"
+		;;
+esac
+echo "$SEPARATOR"
+
+
+echo "Installing packages"
+sudo paru -S --needed "${TERMINAL[@]}"
+sudo paru -S --needed "${BASIC[@]}"
+sudo paru -S --needed "${DEVELOPMENT[@]}"
+sudo paru -S --needed "${APPLICATIONS[@]}"
+sudo paru -S --needed "${SOUND[@]}"
+sudo paru -S --needed "${WINE[@]}"
+sudo paru -S --needed "${THEMING[@]}"
+sudo paru -S --needed "${BROWSERS[@]}"
+
+
+if [[ "$STEAM" == "1" ]]; then
+	sudo paru -S --needed steam
+fi
+
+
+if [[ "$LATEX" == "1" ]]; then
+	sudo paru -S --needed texlive-most biber
+fi
+
+
+if [[ "$MINECRAFT" == "1" ]]; then
+	sudo paru -S --needed prismlauncher
+fi
+
+
+if [[ "$RUST" == "1" ]]; then
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+fi
+
+
+if [[ "$ASEPRITE" == "1" ]]; then
+	paru -S --needed aseprite
+fi
+
+
+if [[ "$BETTERBIRD" == "1" ]]; then
+	paru -S --needed betterbird-bin
+fi
+
+
+if [[ "$NEOTHESIA" == "1" ]]; then
+	paru -S --needed neothesia
+fi
+
+
+if [[ "$REIHA" == "1" ]]; then
+	curl -L -o reiha https://github.com/Barysk/reiha/releases/download/v1.2.0/reiha
+	chmod +x reiha
+	sudo mv reiha /usr/local/bin/
+fi
+
+
+if [[ "$TESUTERU" == "1" ]]; then
+	curl -L -o tesuteru https://github.com/Barysk/testownik_cli/releases/download/ver1.0.1/tesuteru
+	chmod +x tesuteru
+	sudo mv tesuteru /usr/local/bin/
+fi
+
+
+if [[ "$TOOLS" == "1" ]]; then
+	git clone https://github.com/Barysk/tools
+	cd tools/
+	./build_tools.bash
+	./install.bash
+	cd $RST_PATH
+fi
+echo "$SEPARATOR"
+
+
+echo "removing $TMP_FOLDER at $HOME"
+cd $HOME
+rm -rf $TMP_FOLDER
+echo "$SEPARATOR"
+
+
+echo "building modules for waybar"
+cd $HOME/.config/waybar/src_modules/
+./build_modules.sh
+cd $HOME
+echo "$SEPARATOR"
+
+
+echo "updating tldr"
+tldr --update
+echo "$SEPARATOR"
+
+
+echo "setting up auto-cpufreq"
+sudo auto-cpufreq --install
+echo "$SEPARATOR"
+
+
+echo "enabling bluetooth.service"
+sudo systemctl enable --now bluetooth.service
+echo "$SEPARATOR"
+
+
+echo "setting pcmanfm as a deafault file explorer"
+xdg-mime default pcmanfm.desktop inode/directory
+echo "$SEPARATOR"
+
+
+echo "All done!"
+echo ""
+
+
+echo "Reboot is advised"
+echo "$SEPARATOR"
+
+
+echo "Reboot?"
+read -rp "[ Y/n ]: " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+	reboot
+fi
+
+
+################################################################################
+
+### PLANS ######################################################################
+# RIVER_SESSION=(
+# 	wayland
+# 	river
+# 	xdg-desktop-portal-wlr
+# 	xdg-desktop-portal-gtk
+# 	wl-clipboard
+# 	wlr-randr
+# 	hyprpolkitagent
+# 	hyprlock
+# 	grim
+# 	slurp
+# 	mako
+# 	swaybg
+# 	waybar
+# 	imv
+# 	tofi
+# 	qt5-wayland
+# 	qt6-wayland
+# 	qt6ct
+# )
+
+# DWM_SESSION=(
+# 	xorg
+# 	xorg-xinit
+# 	dmenu
+# 	picom
+# 	feh
+# 	dunst
+# 	betterlockscreen
+# 	qt6ct
+# )
+################################################################################
+
+# Copyright (c) 2025 Barys Kamaroŭ. All Rights Reserved.
