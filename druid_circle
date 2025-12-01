@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ### INFO #######################################################################
-### Recuirements: multilib enabled, internet conection is present.
+### Requirements: multilib enabled, internet conection is present.
 ### Feel free to modify script according to your needs.
 ### Script written using STRUCTURED paradigm with no jumps.
 ### Script uses autoconfig scripts provided in my other repos e.g. dot_hyprland.
@@ -65,7 +65,7 @@ BASE_PACKAGES=(
 )
 
 ### SESSION
-# TODO add river and dwm
+# TODO add dwm
 HYPR_SESSION=(
 	wayland
 	xorg-xwayland
@@ -88,6 +88,28 @@ HYPR_SESSION=(
 	hyprqt6engine-git
 	imv
 	tofi
+)
+
+RIVER_SESSION=(
+	wayland
+	xorg-xwayland
+	river
+	xdg-desktop-portal-wlr
+	xdg-desktop-portal-gtk
+	wl-clipboard
+	wlr-randr
+	hyprpolkitagent
+	hyprlock
+	grim
+	slurp
+	mako
+	swaybg
+	waybar
+	imv
+	tofi
+	qt5-wayland
+	qt6-wayland
+	qt6ct
 )
 
 ### Other
@@ -240,11 +262,15 @@ printf  "%s\n%s\n%s\n" \
 	"Choose Session Type" \
 	"Leave empty for none" \
 	"1) Hyprland"
+	"2) River"
 read -rp "Choice: " choice
 
 case "$choice" in
 	1)
 		SESSION="hyprland"
+		;;
+	2)
+		SESSION="river"
 		;;
 	*)
 		SESSION="none"
@@ -304,6 +330,9 @@ case "$SESSION" in
 	hyprland)
 		git clone https://github.com/barysk/dot_hyprland
 		;;
+	river)
+		git clone https://github.com/barysk/dot_river
+		;;
 	*)
 		echo "No session since SESSION = $SESSION"
 		;;
@@ -329,6 +358,11 @@ mv nvim $HOME/.config/
 case "$SESSION" in
 	hyprland)
 		cd dot_hyprland
+		./autoconf deploy
+		cd $RST_PATH
+		;;
+	river)
+		cd dot_river
 		./autoconf deploy
 		cd $RST_PATH
 		;;
@@ -358,6 +392,9 @@ case "$SESSION" in
 	hyprland)
 		paru -S --needed "${HYPR_SESSION[@]}"
 		;;
+	river)
+		paru -S --needed "${RIVER_SESSION[@]}"
+		;;
 	*)
 		echo "No session since SESSION = $SESSION"
 		;;
@@ -382,7 +419,7 @@ fi
 
 
 if [[ "$LATEX" == "1" ]]; then
-	sudo paru -S --needed texlive-most biber
+	sudo paru -S --needed texlive-most biber texlive-luatex
 fi
 
 
@@ -486,27 +523,6 @@ fi
 ################################################################################
 
 ### PLANS ######################################################################
-# RIVER_SESSION=(
-# 	wayland
-# 	river
-# 	xdg-desktop-portal-wlr
-# 	xdg-desktop-portal-gtk
-# 	wl-clipboard
-# 	wlr-randr
-# 	hyprpolkitagent
-# 	hyprlock
-# 	grim
-# 	slurp
-# 	mako
-# 	swaybg
-# 	waybar
-# 	imv
-# 	tofi
-# 	qt5-wayland
-# 	qt6-wayland
-# 	qt6ct
-# )
-
 # DWM_SESSION=(
 # 	xorg
 # 	xorg-xinit
