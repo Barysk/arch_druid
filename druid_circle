@@ -115,6 +115,8 @@ DWM_SESSION=(
 	xorg
 	xorg-xinit
 	dmenu
+	j4-dmenu-desktop
+	flameshot
 	picom
 	feh
 	dunst
