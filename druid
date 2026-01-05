@@ -61,7 +61,7 @@ BASE_PACKAGES=(
 	base
 	base-devel
 	linux-zen-headers
-	linux-lts-headers
+	# linux-lts-headers
 )
 
 ### SESSION
@@ -78,7 +78,7 @@ HYPR_SESSION=(
 	grim
 	slurp
 	hyprsunset
- 	hyprpicker
+	hyprpicker
 	mako
 	swaybg
 	waybar
@@ -118,9 +118,10 @@ DWM_SESSION=(
 	j4-dmenu-desktop
 	flameshot
 	picom
+	redshift
 	feh
 	dunst
-	betterlockscreen
+	betterlockscreen # AUR
 	qt6ct
 )
 
@@ -144,6 +145,7 @@ TERMINAL=(
 	tree
 	tree-sitter-cli
 	udisks2
+	arch-wiki-docs
 )
 
 BASIC=(
@@ -151,17 +153,22 @@ BASIC=(
 	networkmanager
 	bluez
 	bluez-utils
-	xpadneo-dkms
+	xpadneo-dkms # AUR
 	thermald
-	auto-cpufreq
+	auto-cpufreq # AUR
 	brightnessctl
 	network-manager-applet
 	playerctl
-	redshift
+	noto-fonts
+	noto-fonts-cjk
+	noto-fonts-emoji
+	noto-fonts-extra
 )
 
 DEVELOPMENT=(
 	clang
+	make
+	cmake
 	odin
 	raylib
 	docker
@@ -176,7 +183,7 @@ APPLICATIONS=(
 	mpv
 	obs-studio
 	pavucontrol
-	pcmanfm-gtk3
+	pcmanfm
 	qbittorrent
 	qutebrowser
 	reaper
@@ -185,12 +192,12 @@ APPLICATIONS=(
 	telegram-desktop
 	zathura
 	zathura-pdf-mupdf
-	bluetuith-bin
-	proton-ge-custom-bin
-	anki-bin
-	blockbench-bin
-	vesktop-bin
-	localsend-bin
+	bluetuith-bin # AUR
+	proton-ge-custom-bin # AUR
+	anki-bin # AUR
+	blockbench-bin # AUR
+	vesktop-bin # AUR
+	localsend-bin # AUR
 )
 
 SOUND=(
@@ -225,8 +232,10 @@ THEMING=(
 )
 
 BROWSERS=(
-	brave-bin
-	librewolf-bin
+	brave-bin # AUR
+	firefox
+	chromium
+	# librewolf-bin # AUR
 )
 
 SEPARATOR='
@@ -299,8 +308,7 @@ echo "$SEPARATOR"
 ################################################################################
 
 ### SCRIPT INIT ################################################################
-printf "%s" "Druid (druidname) will begin begun a ritual in..."
-sleep 1
+printf "%s" "Druid will begin a ritual in "
 printf "%s" "5.."
 sleep 1
 printf "%s" "4.."
@@ -310,8 +318,8 @@ sleep 1
 printf "%s" "2.."
 sleep 1
 printf "%s\n" "1.."
-sleep 1
 echo "$SEPARATOR"
+sleep 1
 
 
 cd $HOME
@@ -327,7 +335,8 @@ echo "$SEPARATOR"
 
 
 echo "ensuring base are installed"
-sudo pacman -S --needed $BASE_PACKAGES
+sudo pacman -S --needed "${BASE_PACKAGES[@]}"
+sudo pacman -S --needed "${DEVELOPMENT[@]}"
 echo "$SEPARATOR"
 
 
@@ -336,8 +345,8 @@ sudo pacman -S --needed git
 echo "$SEPARATOR"
 
 
-echo "downloading paru-bin"
-git clone https://aur.archlinux.org/paru-bin.git
+echo "downloading paru"
+git clone https://aur.archlinux.org/paru.git
 echo "$SEPARATOR"
 
 
@@ -357,14 +366,25 @@ case "$SESSION" in
 		;;
 esac
 git clone https://github.com/barysk/nvim
+git clone https://github.com/barysk/seine_layout
 echo "$SEPARATOR"
 
 
-echo "installing paru-bin"
-cd paru-bin
+echo "installing paru"
+cd paru
 makepkg -sri
 cd $RST_PATH
 echo "$SEPARATOR"
+
+
+echo "Installing packages"
+paru -S --needed "${BASIC[@]}"
+paru -S --needed "${TERMINAL[@]}"
+paru -S --needed "${APPLICATIONS[@]}"
+paru -S --needed "${SOUND[@]}"
+paru -S --needed "${WINE[@]}"
+paru -S --needed "${THEMING[@]}"
+paru -S --needed "${BROWSERS[@]}"
 
 
 echo "applying dotfiles"
@@ -373,6 +393,9 @@ cd nvim
 rm -rf .git
 cd $RST_PATH
 mv nvim $HOME/.config/
+cd seine_layout
+./install.sh
+cd $RST_PATH
 case "$SESSION" in
 	hyprland)
 		cd dot_hyprland
@@ -398,13 +421,13 @@ esac
 echo "Installing GPU drivers"
 case "$GPU_VENDOR" in
 	intel)
-		sudo paru -S --needed "${INTEL_PACKAGES[@]}"
+		paru -S --needed "${INTEL_PACKAGES[@]}"
 		;;
 	amd)
-		sudo paru -S --needed "${AMD_PACKAGES[@]}"
+		paru -S --needed "${AMD_PACKAGES[@]}"
 		;;
 	nvidia)
-		sudo paru -S --needed "${NVIDIA_PACKAGES[@]}"
+		paru -S --needed "${NVIDIA_PACKAGES[@]}"
 		;;
 esac
 echo "$SEPARATOR"
@@ -428,29 +451,18 @@ esac
 echo "$SEPARATOR"
 
 
-echo "Installing packages"
-sudo paru -S --needed "${TERMINAL[@]}"
-sudo paru -S --needed "${BASIC[@]}"
-sudo paru -S --needed "${DEVELOPMENT[@]}"
-sudo paru -S --needed "${APPLICATIONS[@]}"
-sudo paru -S --needed "${SOUND[@]}"
-sudo paru -S --needed "${WINE[@]}"
-sudo paru -S --needed "${THEMING[@]}"
-sudo paru -S --needed "${BROWSERS[@]}"
-
-
 if [[ "$STEAM" == "1" ]]; then
-	sudo paru -S --needed steam
+	paru -S --needed steam
 fi
 
 
 if [[ "$LATEX" == "1" ]]; then
-	sudo paru -S --needed texlive-most biber texlive-luatex
+	paru -S --needed texlive biber texlive-luatex texlive-lang
 fi
 
 
 if [[ "$MINECRAFT" == "1" ]]; then
-	sudo paru -S --needed prismlauncher
+	paru -S --needed prismlauncher
 fi
 
 
@@ -465,7 +477,7 @@ fi
 
 
 if [[ "$BETTERBIRD" == "1" ]]; then
-	paru -S --needed betterbird-bin
+	paru -S --needed betterbird-bin # AUR
 fi
 
 
@@ -501,13 +513,6 @@ echo "$SEPARATOR"
 echo "removing $TMP_FOLDER at $HOME"
 cd $HOME
 rm -rf $TMP_FOLDER
-echo "$SEPARATOR"
-
-
-echo "building modules for waybar"
-cd $HOME/.config/waybar/src_modules/
-./build_modules.sh
-cd $HOME
 echo "$SEPARATOR"
 
 
