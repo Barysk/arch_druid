@@ -121,7 +121,6 @@ DWM_SESSION=(
 	redshift
 	feh
 	dunst
-	betterlockscreen # AUR
 	qt6ct
 )
 
